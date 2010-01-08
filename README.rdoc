@@ -2,7 +2,7 @@
 
 Simple chat in Ruby, implemented using WebSockets.
 
-= Usage
+== Usage
 - Install em-websocket gem
 - Run "ruby main.rb"
 - Open index.html in any browser, which has WebSocket support (e.g. Google Chrome Beta/Dev)
