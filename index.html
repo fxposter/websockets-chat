@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var $messages = $("#messages");
+        
+        function sendMessage(event) {
+          $messages.append("<p>" + event.data + "</p>")
+            .attr("scrollTop", $messages.attr("scrollHeight"));
+        };
+        
+        function createWebSocket(username) {
+          var ws = new WebSocket("ws://localhost:8080/?username=" + username);
+          ws.onmessage = sendMessage;
+          return ws;
+        };
+      
+        var ws = null;
+        $("#login").submit(function(){
+          if ($("#username").val() == "") {
+            alert("enter some name");
+            return false;
+          }
+          
+          ws = createWebSocket($("#username").val());
+          
+          $("#send-message").unbind("submit").bind("submit", function() {
+            ws.send($("#message").val());
+            $("#message").val("");
+            return false;
+          });
+          
+          $("#auth").hide();
+          $("#chat").show();
+          return false;
+        });
+        
+        $("#logout").click(function(){
+          ws.close();
+          $("#auth").show();
+          $("#chat").hide();
+          $("#messages").empty();
+          return false;
+        });
+        
+        $("#chat").hide();
+        
+        $(window).unload(function(){
+          if (ws != null)
+            ws.close(); // prevent Chrome from crush
+        });
+      });
+    </script>
+    
+    <style type="text/css">
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      
+      #chat {
+        position: absolute;
+        top: 10px;
+        bottom: 110px;
+        left: 10px;
+        right: 10px;
+      }
+      
+      #messages {
+        height: 100%;
+        padding: 5px;
+        border: 1px solid #000000;
+        overflow: auto;
+      }
+      
+        #messages p {
+          margin: 0;
+          padding: 0;
+          border: none;
+          line-height: 1.5;
+        }
+      
+      #logout {
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="auth">
+      <h1>WebSocket's chat</h1>
+      <form id="login" method="post" action="#">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username">
+        <input type="submit" value="Login">
+      </form>
+    </div>
+    
+    <div id="chat">
+      <div id="messages"></div>
+      
+      <a href="#logout" id="logout">Logout</a>
+      <form id="send-message" method="post" action="#">
+        <input type="text" name="message" id="message">
+        <input type="submit" value="Send message">
+      </form>
+    </div>
+    
+  </body>
+
+</html>
