@@ -1,4 +1,3 @@
-$: << "#{File.dirname(__FILE__)}/../em-websocket/lib"
 # require "rubygems"
 require "em-websocket"
 
